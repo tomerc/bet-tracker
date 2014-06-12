@@ -8,6 +8,12 @@
     <packaging>pom</packaging>
 
     <name>bet-tracker-parent</name>
+
+    <scm>
+        <connection>http://github.com/tomerc/bet-tracker.git</connection>
+        <developerConnection>https://github.com/tomerc/bet-tracker.git</developerConnection>
+    </scm>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

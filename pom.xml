@@ -11,8 +11,8 @@
     <name>bet-tracker-parent</name>
 
     <scm>
-        <connection>http://github.com/tomerc/bet-tracker.git</connection>
-        <developerConnection>https://github.com/tomerc/bet-tracker.git</developerConnection>
+        <connection>scm:git:http://github.com/tomerc/bet-tracker.git</connection>
+        <developerConnection>scm:git:https://github.com/tomerc/bet-tracker.git</developerConnection>
     </scm>
 
     <properties>

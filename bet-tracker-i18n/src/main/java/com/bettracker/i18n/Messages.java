@@ -28,6 +28,9 @@ public abstract class Messages {
         return getMessage(code, args, "", Locale.getDefault());
     }
 
+    public static String getMessage(String code) throws NoSuchMessageException {
+        return getMessage(code, null, "", Locale.getDefault());
+    }
 
     private static MessageSource getMessageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();

@@ -24,9 +24,25 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.bettracker</groupId>
+                <artifactId>bet-tracker-i18n</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bettracker</groupId>
+                <artifactId>bet-tracker-api</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
                 <version>${spring.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -80,7 +96,12 @@
                 <version>1.0.6</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate.javax.persistence</groupId>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>17.0</version>
+            </dependency>
+            <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
                 <artifactId>hibernate-jpa-2.1-api</artifactId>
                 <version>1.0.0.Final</version>
             </dependency>
@@ -90,7 +111,7 @@
                 <version>4.2.13.Final</version>
             </dependency>
             <dependency>
-            <groupId>org.apache.commons</groupId>
+                <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>3.3.2</version>
             </dependency>
@@ -263,5 +284,6 @@
     </build>
     <modules>
         <module>bet-tracker-api</module>
+        <module>bet-tracker-i18n</module>
     </modules>
 </project>

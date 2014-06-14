@@ -1,6 +1,5 @@
-package com.bettracker;
+package com.bettracker.i18n;
 
-import com.bettracker.i18n.Messages;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

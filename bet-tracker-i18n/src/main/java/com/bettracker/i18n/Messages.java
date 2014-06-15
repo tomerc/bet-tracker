@@ -20,11 +20,11 @@ public abstract class Messages {
         return getMessage(code, args, defaultMessage, Locale.getDefault());
     }
 
-    public static String getMessage(String code, Object[] args, Locale locale) throws NoSuchMessageException {
+    public static String getMessage(String code, Object[] args, Locale locale) {
         return getMessage(code, args, "", locale);
     }
 
-    public static String getMessage(String code, Object[] args) throws NoSuchMessageException {
+    public static String getMessage(String code, Object[] args) {
         return getMessage(code, args, "", Locale.getDefault());
     }
 

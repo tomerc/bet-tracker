@@ -8,13 +8,8 @@
         <artifactId>bet-tracker-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>bet-tracker-domain</artifactId>
+    <artifactId>bet-tracker-web-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>bet-tracker-domain</name>
-    <dependencies>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-        </dependency>
-    </dependencies>
+    <packaging>pom</packaging>
+    <name>bet-tracker-web-parent</name>
 </project>

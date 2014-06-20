@@ -14,5 +14,6 @@
     <modules>
         <module>bet-tracker-web-war</module>
         <module>bet-tracker-web-application</module>
+        <module>bet-tracker-web-common</module>
     </modules>
 </project>

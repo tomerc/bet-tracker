@@ -19,11 +19,11 @@ public class TournamentSchedule implements Serializable {
 
 
     @ManyToOne
-    @Column(name = "bet_id")
+    @JoinColumn(name = "bet_id")
     private Bet bet;
 
     @ManyToOne
-    @Column(name = "team_id")
+    @JoinColumn(name = "team_id")
     private Team team;
 
     @Column(name = "game_date")

@@ -6,6 +6,10 @@
 
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.bettracker.domain.Bet</class>
+        <class>com.bettracker.domain.Player</class>
+        <class>com.bettracker.domain.Sport</class>
+        <class>com.bettracker.domain.Team</class>
+        <class>com.bettracker.domain.TournamentSchedule</class>
         <properties>
             <property name="hibernate.connection.url" value="jdbc:hsqldb:mem"/>
             <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>

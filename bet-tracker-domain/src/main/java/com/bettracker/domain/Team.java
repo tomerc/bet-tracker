@@ -20,7 +20,7 @@ public class Team implements Serializable {
     private String teamName;
 
     @ManyToOne(targetEntity = Sport.class)
-    @Column(name = "sport_id")
+    @JoinColumn(name = "sport_id")
     private Sport sport;
 
 

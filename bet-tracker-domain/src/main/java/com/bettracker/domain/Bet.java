@@ -17,15 +17,15 @@ public class Bet implements Serializable {
     private Integer betId;
 
     @ManyToOne
-    @Column(name = "team_id")
+    @JoinColumn(name = "team_id")
     private Team team;
 
     @ManyToOne
-    @Column(name = "player_id")
+    @JoinColumn(name = "player_id")
     private Player player;
 
     @ManyToOne
-    @Column(name = "tournament_id")
+    @JoinColumn(name = "tournament_id")
     private TournamentSchedule tournamentSchedule;
 
     public Integer getBetId() {

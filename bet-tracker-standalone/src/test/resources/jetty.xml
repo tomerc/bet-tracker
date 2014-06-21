@@ -63,8 +63,7 @@
         </Call>
         <Call name="setWar">
             <!-- Careful not to reformat the following line - may break jetty -->
-            <Arg><SystemProperty name="jetty.home" default="."/>
-                /bet-tracker-web-parent/bet-tracker-web-war/src/main/webapp
+            <Arg><SystemProperty name="jetty.home" default="."/>/bet-tracker-web-parent/bet-tracker-web-war/src/main/webapp
             </Arg>
         </Call>
         <Get name="SessionHandler">

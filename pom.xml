@@ -19,7 +19,7 @@
         <spring.version>4.0.5.RELEASE</spring.version>
         <slf4j.version>1.6.4</slf4j.version>
         <jetty.version>7.0.2.v20100331</jetty.version>
-        <hibernate.version>4.2.13.Final</hibernate.version>
+        <hibernate.version>4.3.5.Final</hibernate.version>
     </properties>
 
 

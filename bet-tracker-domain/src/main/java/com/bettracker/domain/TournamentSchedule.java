@@ -8,7 +8,7 @@ import java.sql.Date;
  * @author Tomer Cohen
  */
 @Entity
-@Table("tournament_schedule")
+@Table(name = "tournament_schedule")
 public class TournamentSchedule implements Serializable {
     private static final long serialVersionUID = -4574889118420362792L;
 
@@ -23,7 +23,7 @@ public class TournamentSchedule implements Serializable {
     private Bet bet;
 
     @ManyToOne
-    @Column("team_id")
+    @Column(name = "team_id")
     private Team team;
 
     @Column(name = "game_date")

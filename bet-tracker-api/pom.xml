@@ -4,10 +4,10 @@
     <parent>
         <groupId>com.bettracker</groupId>
         <artifactId>bet-tracker-parent</artifactId>
-        <version>1.0</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
     <artifactId>bet-tracker-api</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <name>bet-tracker-api</name>
     <dependencies>
     </dependencies>

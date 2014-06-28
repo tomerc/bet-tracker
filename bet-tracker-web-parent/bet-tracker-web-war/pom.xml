@@ -27,6 +27,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <warName>bet-tracker</warName>
+                </configuration>
             </plugin>
         </plugins>
     </build>

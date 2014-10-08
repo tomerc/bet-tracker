@@ -6,7 +6,7 @@
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
-        <property name="prefix" value="/WEB-INF/trading/"/>
+        <property name="prefix" value="/WEB-INF/bettracker/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 

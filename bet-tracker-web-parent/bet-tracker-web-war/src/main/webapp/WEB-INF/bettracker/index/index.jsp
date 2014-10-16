@@ -1,7 +1,7 @@
 <%@include file="../includes/taglibs.jsp" %>
 <html>
 <%@include file="../includes/header.jsp" %>
-<body>
+<body class="betTrackerHomePage">
 <div>Welcome to Bet Tracker</div>
 <div><input class="buttonClass" type="button" onclick="alert('Betting will start soon!!');" value="START BETTING"></div>
 </body>

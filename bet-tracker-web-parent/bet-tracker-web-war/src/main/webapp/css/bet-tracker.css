@@ -4,3 +4,6 @@
     width: 150px;
     cursor: hand;
 }
+.betTrackerHomePage {
+    background-image: url("../images/homepage-bg.jpg");
+}

@@ -3,6 +3,8 @@
 <%@include file="../includes/header.jsp" %>
 <body class="betTrackerHomePage">
 <div>Welcome to Bet Tracker</div>
-<div><input class="buttonClass" type="button" onclick="alert('Betting will start soon!!');" value="START BETTING"></div>
+<form id="indexForm" method="post">
+    <div><input class="buttonClass" type="submit" value="START BETTING"></div>
+</form>
 </body>
 </html>

@@ -1,6 +1,5 @@
-<%@include file="../includes/taglibs.jsp" %>
 <html>
-<%@include file="../includes/header.jsp" %>
+<%@include file="/WEB-INF/bettracker/includes/header.jsp" %>
 <head>
     <title>Administrator Page</title>
 </head>

@@ -1,4 +1,3 @@
-<%@include file="../includes/taglibs.jsp" %>
 <html>
 <%@include file="../includes/header.jsp" %>
 <body class="betTrackerHomePage">

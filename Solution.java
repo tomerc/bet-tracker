@@ -5,23 +5,43 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Tomer Cohen
  */
 public class Solution {
-    private final ConcurrentMap<LocalDateTime, List<EpochLatencyNode>> epochLatencyNodesPerMinute;
-    private final Set<LocalDateTime> processDateTimes;
+    // We'll keep sequence numbers in the key order to ensure that the nodes inside the SortedSet are unique.
+    // which effectively allows us to insert the nodes into a sorted set, keep it sorted without having to
+    // sort later on a larger unsorted collection sine the nodes can come out of turn.
+    private static final AtomicLong SEQUENCE_NUMBER_GENERATOR = new AtomicLong(0L);
+    // a map that will keep all the latency nodes per minute, since we'd like to calculate the percentile
+    // on a minute by minute basis. Keep the map concurrent as there may be multiple threads trying to read/write and
+    // it is a global map for the solution.
+    private final ConcurrentMap<LocalDateTime, SortedSet<EpochLatencyNode>> epochLatencyNodesPerMinute;
+    // keep a simple set of processed times (by the minute), don't care about sorted here, and if the hashcode
+    // is efficient enough the fetchtime is O(1) since a HashSet is backed by a HashMap so it should be fast.
+    private final Set<LocalDateTime> processedDateTimes;
 
+    /**
+     * Solution constructor
+     */
     public Solution() {
         this.epochLatencyNodesPerMinute = new ConcurrentHashMap<>();
-        this.processDateTimes = new HashSet<>();
+        this.processedDateTimes = new HashSet<>();
     }
 
+    /**
+     * A class which keeps the result of an insertion of a node into the SortedSet.
+     */
     public static class InsertResult {
         private final boolean printResult;
         private final LocalDateTime adjustedLocalDateOfOfNode;
         private final LocalDateTime printResultForDate;
+
+        public InsertResult(boolean printResult) {
+            this(false, LocalDateTime.now(), LocalDateTime.now());
+        }
 
         public InsertResult(boolean printResult, LocalDateTime adjustedLocalDateOfOfNode, LocalDateTime printResultForDate) {
             this.printResult = printResult;
@@ -52,38 +72,67 @@ public class Solution {
     }
 
 
+    /**
+     * Insert a node into a sorted set.
+     *
+     * @param node The node to insert
+     * @return The insertion result and if to print out the percentile for the minute since there shouldn't be any more
+     * nodes coming in for that minute.
+     */
     public InsertResult insertNode(EpochLatencyNode node) {
+        if (node.getLatency() < 0.0) {
+            // can't be less than 0.
+            throw new IllegalArgumentException("Latency cannot be less than 0.");
+        }
+        if (node.getLatency() > 150) {
+            // discard latency over 150
+            return new InsertResult(false);
+        }
         LocalDateTime localDateTimeOfNode = node.getLocalDateTime();
         LocalDateTime adjustedLocalDateOfOfNode = localDateTimeOfNode.withSecond(0);
-        if (epochLatencyNodesPerMinute.containsKey(adjustedLocalDateOfOfNode)) {
-            List<EpochLatencyNode> epochLatencyNodes = epochLatencyNodesPerMinute.get(adjustedLocalDateOfOfNode);
-            epochLatencyNodes.add(node);
-        } else {
-            List<EpochLatencyNode> value = new ArrayList<>();
-            epochLatencyNodesPerMinute.put(adjustedLocalDateOfOfNode, value);
-            value.add(node);
+        epochLatencyNodesPerMinute.putIfAbsent(adjustedLocalDateOfOfNode, new TreeSet<>());
+        SortedSet<EpochLatencyNode> value = epochLatencyNodesPerMinute.get(adjustedLocalDateOfOfNode);
+        if (!value.isEmpty() && checkIfOutOfRange(node, value.last())) {
+            // if out of range, discard
+            return new InsertResult(false);
         }
 
+        value.add(node);
         LocalDateTime previousRecordedTime = adjustedLocalDateOfOfNode.minusMinutes(1);
-        return new InsertResult(epochLatencyNodesPerMinute.containsKey(previousRecordedTime) && !processDateTimes.contains(adjustedLocalDateOfOfNode), adjustedLocalDateOfOfNode, previousRecordedTime);
+        return new InsertResult(epochLatencyNodesPerMinute.containsKey(previousRecordedTime) && !processedDateTimes.contains(previousRecordedTime), adjustedLocalDateOfOfNode, previousRecordedTime);
     }
 
-    public EpochLatencyNode calculatePercentile(LocalDateTime localDateTime, int percentile) {
-        List<EpochLatencyNode> epochLatencyNodes = epochLatencyNodesPerMinute.get(localDateTime);
-        Collections.sort(epochLatencyNodes);
+    private boolean checkIfOutOfRange(EpochLatencyNode node, EpochLatencyNode lastRecorededNode) {
+        return Duration.between(lastRecorededNode.getLocalDateTime(), node.getLocalDateTime()).getSeconds() > 60;
+    }
+
+    /**
+     * Calculate the percentile for a minute, specified by the localDateTime and the percentile parameter
+     *
+     * @param localDateTime The minute for which to calculate the percentile for.
+     * @param percentile    The percentile to calculate for.
+     */
+    public void calculateAndPrintPercentile(LocalDateTime localDateTime, int percentile) {
+        SortedSet<EpochLatencyNode> epochLatencyNodes = epochLatencyNodesPerMinute.get(localDateTime);
         double i = (percentile / 100.0) * epochLatencyNodes.size();
-        double latency = epochLatencyNodes.get((int) i).getLatency();
-        long epochSecond = Instant.ofEpochSecond(localDateTime.toEpochSecond(ZoneOffset.UTC)).getEpochSecond();
-        return new EpochLatencyNode(epochSecond, latency);
+        EpochLatencyNode[] epochLatencyArray = epochLatencyNodes.toArray(new EpochLatencyNode[0]);
+        EpochLatencyNode epochLatencyNode = epochLatencyArray[(int) i];
+        System.out.println(epochLatencyNode);
+        processedDateTimes.add(localDateTime);
     }
 
-
+    /**
+     * This class represents a node inside the set, it's comparable so it can be sorted based upon the epochtime/sequence
+     * number
+     */
     public static class EpochLatencyNode implements Comparable<EpochLatencyNode> {
+        private final long sequenceNumber;
         private final long epochTime;
         private final double latency;
         private LocalDateTime localDateTime;
 
-        public EpochLatencyNode(long epochTime, double latency) {
+        public EpochLatencyNode(long sequenceNumber, long epochTime, double latency) {
+            this.sequenceNumber = sequenceNumber;
             this.epochTime = epochTime;
             this.latency = latency;
             this.localDateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(epochTime), ZoneId.of("UTC"));
@@ -101,17 +150,22 @@ public class Solution {
             return localDateTime;
         }
 
+        public long getSequenceNumber() {
+            return sequenceNumber;
+        }
+
         public static EpochLatencyNode from(long epochTime, double latency) {
-            return new EpochLatencyNode(epochTime, latency);
+            return new EpochLatencyNode(SEQUENCE_NUMBER_GENERATOR.getAndIncrement(), epochTime, latency);
         }
 
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (!(o instanceof EpochLatencyNode)) return false;
 
             EpochLatencyNode that = (EpochLatencyNode) o;
 
+            if (sequenceNumber != that.sequenceNumber) return false;
             if (epochTime != that.epochTime) return false;
             return Double.compare(that.latency, latency) == 0;
         }
@@ -120,7 +174,8 @@ public class Solution {
         public int hashCode() {
             int result;
             long temp;
-            result = (int) (epochTime ^ (epochTime >>> 32));
+            result = (int) (sequenceNumber ^ (sequenceNumber >>> 32));
+            result = 31 * result + (int) (epochTime ^ (epochTime >>> 32));
             temp = Double.doubleToLongBits(latency);
             result = 31 * result + (int) (temp ^ (temp >>> 32));
             return result;
@@ -136,7 +191,11 @@ public class Solution {
 
         @Override
         public int compareTo(EpochLatencyNode o) {
-            return Long.compare(this.epochTime, o.getEpochTime());
+            int epochCompare = Long.compare(this.epochTime, o.getEpochTime());
+            if (epochCompare == 0) {
+                return Long.compare(this.sequenceNumber, o.getSequenceNumber());
+            }
+            return epochCompare;
         }
     }
 
@@ -150,9 +209,9 @@ public class Solution {
             String[] split = nextLine.split(" ");
             insertResult = solution.insertNode(EpochLatencyNode.from(Long.parseLong(split[0]), Double.parseDouble(split[1])));
             if (insertResult.isPrintResult()) {
-                System.out.println(solution.calculatePercentile(insertResult.getPrintResultForDate(), 90));
+                solution.calculateAndPrintPercentile(insertResult.getPrintResultForDate(), 90);
             }
         }
-        System.out.println(solution.calculatePercentile(insertResult.getAdjustedLocalDateOfOfNode(), 90));
+        solution.calculateAndPrintPercentile(insertResult.getAdjustedLocalDateOfOfNode(), 90);
     }
 }
